@@ -15,13 +15,13 @@ type Config struct {
 	DBName     string
 }
 
-func LoadConfig() *Config {
+func LoadConfig() Config {
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("No .env file found")
 	}
 
-	return &Config{
+	return Config{
 		DBHost:     getEnv("DB_HOST", "localhost"),
 		DBPort:     getEnv("DB_PORT", "5432"),
 		DBUser:     getEnv("DB_USER", "postgres"),

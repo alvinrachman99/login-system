@@ -17,7 +17,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
-	err := r.DB.QueryRow("SELECT id, email, password, created_at, updated_at, public_id FROM users WHERE email = $1", email).
+	err := r.DB.QueryRow("SELECT id, email, password, firstname, lastname, public_id FROM users WHERE email = $1", email).
 		Scan(&user.Id, &user.Email, &user.Password, &user.Firstname, &user.Lastname, &user.PublicId)
 	if err != nil {
 		return nil, err
@@ -28,5 +28,36 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 func (r *UserRepository) CreateUser(user *models.User) error {
 	query := "INSERT INTO users (email, password, firstname, lastname, public_id) VALUES ($1, $2, $3, $4, $5)"
 	_, err := r.DB.Exec(query, user.Email, user.Password, user.Firstname, user.Lastname, uuid.New())
+	return err
+}
+
+func (r *UserRepository) GetAllUser() ([]models.User, error) {
+	rows, err := r.DB.Query("SELECT id, email, password, firstname, lastname, public_id FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []models.User
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(&user.Id, &user.Email, &user.Password, &user.Firstname, &user.Lastname, &user.PublicId); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+func (r *UserRepository) UpdateUser(user *models.User) error {
+	query := "UPDATE users SET password = $1, firstname = $2, lastname = $3 WHERE id = $4"
+	_, err := r.DB.Exec(query, user.Password, user.Firstname, user.Lastname, user.Id)
+	return err
+}
+
+func (r *UserRepository) DeleteUser(id int) error {
+	query := "DELETE FROM users WHERE id = $1"
+	_, err := r.DB.Exec(query, id)
 	return err
 }

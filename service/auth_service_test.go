@@ -13,14 +13,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var svc *AuthService
+var authService *AuthService
 
 func init() {
 	cfg := config.LoadConfig()
 	db := database.InitDB(cfg)
 	repo := repository.NewUserRepository(db)
 
-	svc = NewAuthService(repo)
+	authService = NewAuthService(repo)
 }
 
 func TestRegister(t *testing.T) {
@@ -32,7 +32,7 @@ func TestRegister(t *testing.T) {
 			Lastname:  uuid.NewString(),
 		}
 
-		err := svc.Register(user)
+		err := authService.Register(user)
 		require.Nil(t, err)
 	})
 }
@@ -49,10 +49,10 @@ func TestLogin(t *testing.T) {
 			Lastname:  uuid.NewString(),
 		}
 
-		err := svc.Register(user)
+		err := authService.Register(user)
 		require.Nil(t, err)
 
-		token, err := svc.Login(email, password, os.Getenv("JWT_SECRET"))
+		token, err := authService.Login(email, password, os.Getenv("JWT_SECRET"))
 		require.Nil(t, err)
 
 		log.Printf("token: %v", token)

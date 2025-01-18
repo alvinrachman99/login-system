@@ -17,8 +17,8 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
-	err := r.DB.QueryRow("SELECT id, email, password, firstname, lastname, public_id FROM users WHERE email = $1", email).
-		Scan(&user.Id, &user.Email, &user.Password, &user.Firstname, &user.Lastname, &user.PublicId)
+	err := r.DB.QueryRow("SELECT id, email, password, firstname, lastname, picture, public_id FROM users WHERE email = $1", email).
+		Scan(&user.Id, &user.Email, &user.Password, &user.Firstname, &user.Lastname, &user.Picture, &user.PublicId)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 }
 
 func (r *UserRepository) GetAllUser() ([]models.User, error) {
-	rows, err := r.DB.Query("SELECT id, email, password, firstname, lastname, public_id FROM users")
+	rows, err := r.DB.Query("SELECT id, email, password, firstname, lastname, picture, public_id FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +51,14 @@ func (r *UserRepository) GetAllUser() ([]models.User, error) {
 }
 
 func (r *UserRepository) UpdateUser(user *models.User) error {
-	query := "UPDATE users SET password = $1, firstname = $2, lastname = $3 WHERE id = $4"
-	_, err := r.DB.Exec(query, user.Password, user.Firstname, user.Lastname, user.Id)
+	query := "UPDATE users SET firstname = $1, lastname = $2 WHERE id = $3"
+	_, err := r.DB.Exec(query, user.Firstname, user.Lastname, user.Id)
+	return err
+}
+
+func (r *UserRepository) UpdatePicture(user *models.User) error {
+	query := "UPDATE users SET picture = $1 WHERE id = $2"
+	_, err := r.DB.Exec(query, user.Picture, user.Id)
 	return err
 }
 

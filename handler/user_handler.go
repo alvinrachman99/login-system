@@ -67,6 +67,38 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+func (h *UserHandler) UpdatePicture(c *fiber.Ctx) error {
+	var user models.User
+
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid ID"})
+	}
+	user.Id = id
+
+	// Ambil file gambar dari form-data
+	file, err := c.FormFile("image")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Failed to get image",
+		})
+	}
+
+	filePath, err := h.UserService.UpdatePicture(&user, file)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Simpan file baru
+	if err := c.SaveFile(file, filePath); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to save image",
+		})
+	}
+
+	return c.JSON(fiber.Map{"status": fiber.StatusOK, "filepath": filePath})
+}
+
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

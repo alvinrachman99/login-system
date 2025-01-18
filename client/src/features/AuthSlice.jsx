@@ -55,6 +55,7 @@ const AuthSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        console.log(action.payload)
         if (action.payload.status === 200) {
           localStorage.setItem("token", action.payload.token);
           localStorage.setItem("email", action.payload.email);
@@ -68,8 +69,8 @@ const AuthSlice = createSlice({
       })
       // logout
       .addCase(logout.fulfilled, (state) => {
-        localStorage.removeItem("token")
-        localStorage.removeItem("email")
+        localStorage.removeItem("token");
+        localStorage.removeItem("email");
       });
   },
 });

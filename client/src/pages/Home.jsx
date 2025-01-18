@@ -1,17 +1,18 @@
 import profile_picture from "../assets/profile_picture.svg";
 import { MdOutlineAlternateEmail } from "react-icons/md";
-import { FaRegUser } from "react-icons/fa";
-import { getUserByEmail, updateUser } from "../features/UserSlice";
+import { FaPencilAlt, FaRegUser } from "react-icons/fa";
+import { getUserByEmail, updateUser, updateImage } from "../features/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../features/AuthSlice";
+import axiosInstance from "../axios/AxiosConfig";
 
 function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { data, loading, error } = useSelector((state) => state.user);
-
+  console.log(data)
   useEffect(() => {
     dispatch(getUserByEmail());
   }, [dispatch]);
@@ -97,6 +98,38 @@ function Home() {
     }
   }
 
+  const inputFile = useRef(null);
+  const handleInputFile = () => {
+    inputFile.current.click();
+  };
+
+  const handleUpdateImage = async (e) => {
+    const file = e.target.files[0];
+    // console.log('file:', file)
+    if (!file) return;
+
+    // Validasi ukuran file (maksimum 100KB)
+    const MAX_SIZE = 100 * 1024; // 100KB
+    if (file.size > MAX_SIZE) {
+      alert('Ukuran file maksimum adalah 100KB.');
+      return;
+    }
+
+    // Validasi tipe file (hanya JPG, JPEG, PNG yang diperbolehkan)
+    const validTypes = ['image/jpeg', 'image/png'];
+    if (!validTypes.includes(file.type)) {
+      alert('Hanya file JPG, JPEG, dan PNG yang diperbolehkan.');
+      return;
+    }
+
+    try {
+      await dispatch(updateImage({file:file, id:user.id}))
+      dispatch(getUserByEmail());
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const handleLogout = async () => {
     await dispatch(logout())
     navigate("/login")
@@ -106,11 +139,19 @@ function Home() {
     <div className="container max-w-full">
       <div className="grid h-screen items-center">
         <div className="flex flex-col w-3/4 md:w-1/2 lg:w-1/4 mx-auto">
-          <div className="">
+          <div className="relative">
+            <FaPencilAlt onClick={handleInputFile} className="absolute border-2 text-2xl bg-gray-500 text-white rounded-full w-8 h-8 p-1 bottom-6 right-20 cursor-pointer"/>
             <img
-              src={profile_picture}
+              src={data ? `${axiosInstance.defaults.baseURL}/images/${data.data.picture}` : profile_picture}
               alt="profile_picture"
-              className="mx-auto w-60"
+              className="mx-auto w-60 h-60 border-2 border-indigo-500 rounded-full object-cover object-center shadow-lg"
+            />
+            <input
+              type="file"
+              ref={inputFile}
+              accept="image/jpeg, image/png"
+              onChange={handleUpdateImage}
+              style={{ display: 'none' }} 
             />
           </div>
           <div className="text-center my-2 text-xl">{data?.data.firstname} {data?.data.lastname}</div>

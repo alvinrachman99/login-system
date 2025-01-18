@@ -21,5 +21,8 @@ func SetupRoutes(app *fiber.App, db *sql.DB, cfg config.Config) {
 	user.Get("/alluser", userHandler.GetAllUser)
 	user.Post("/user", userHandler.GetUserByEmail)
 	user.Put("/update/:id", userHandler.UpdateUser)
+	user.Patch("/update-image/:id", userHandler.UpdatePicture)
 	user.Delete("/delete/:id", userHandler.DeleteUser)
+
+	app.Static("images/", "./uploads")
 }

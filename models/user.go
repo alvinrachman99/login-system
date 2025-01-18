@@ -8,5 +8,6 @@ type User struct {
 	Password  string    `json:"password"`
 	Firstname string    `json:"firstname"`
 	Lastname  string    `json:"lastname"`
+	Picture   string    `json:"picture"`
 	PublicId  uuid.UUID `json:"public_id"`
 }

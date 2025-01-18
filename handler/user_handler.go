@@ -31,6 +31,23 @@ func (h *UserHandler) GetAllUser(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
+func (h *UserHandler) GetUserByEmail(c *fiber.Ctx) error {
+	var req struct {
+		Email string `json:"email"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+	}
+
+	user, err := h.UserService.GetUserByEmail(req.Email)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"status": fiber.StatusOK, "data": user})
+}
+
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

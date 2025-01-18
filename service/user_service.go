@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"login-system/models"
 	"login-system/repository"
 
@@ -17,6 +18,15 @@ func NewUserService(repo *repository.UserRepository) *UserService {
 
 func (s *UserService) GetAllUser() ([]models.User, error) {
 	return s.UserRepo.GetAllUser()
+}
+
+func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
+	user, err := s.UserRepo.GetUserByEmail(email)
+	if err != nil {
+		return nil, errors.New("invalid email")
+	}
+
+	return user, nil
 }
 
 func (s *UserService) UpdateUser(user *models.User) error {

@@ -49,5 +49,5 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.JSON(fiber.Map{"message": "Login successful", "status": fiber.StatusOK, "token": token})
+	return c.JSON(fiber.Map{"message": "Login successful", "email": req.Email, "status": fiber.StatusOK, "token": token})
 }

@@ -18,7 +18,8 @@ func SetupRoutes(app *fiber.App, db *sql.DB, cfg config.Config) {
 	auth.Post("/login", authHandler.Login)
 
 	user := app.Group("/user", middleware.JWTMiddleware())
-	user.Get("/user", userHandler.GetAllUser)
+	user.Get("/alluser", userHandler.GetAllUser)
+	user.Post("/user", userHandler.GetUserByEmail)
 	user.Put("/update/:id", userHandler.UpdateUser)
 	user.Delete("/delete/:id", userHandler.DeleteUser)
 }
